@@ -85,9 +85,54 @@
    #define KEYBOARD_MARGIN          8
    #define KEYBOARD_KEY_SPACING     4
 
+// Parameters for OGA v1.1
+#elif defined(DEVICE_OGA1)
+   #define SCREEN_WIDTH             480
+   #define SCREEN_HEIGHT            320
+   #define HARDWARE_ACCELERATION    0
+   #define FULLSCREEN               1
+   #define FONT_NAME                "NotoSans-Regular.ttf"
+   #define FONT_NAME_MONO           "NotoSansMono-Regular.ttf"
+   #define FONT_SIZE                14
+   #define LINE_HEIGHT              24
+   #define ICON_SIZE                24
+   #define MARGIN_X                 8
+   #define KEYBOARD_MARGIN          3
+   #define KEYBOARD_KEY_SPACING     3
+
+// Parameters for OGS
+#elif defined(DEVICE_OGS)
+   #define SCREEN_WIDTH             854
+   #define SCREEN_HEIGHT            480
+   #define HARDWARE_ACCELERATION    0
+   #define FULLSCREEN               1
+   #define FONT_NAME                "NotoSans-Regular.ttf"
+   #define FONT_NAME_MONO           "NotoSansMono-Regular.ttf"
+   #define FONT_SIZE                20
+   #define LINE_HEIGHT              32
+   #define ICON_SIZE                24
+   #define MARGIN_X                 20
+   #define KEYBOARD_MARGIN          8
+   #define KEYBOARD_KEY_SPACING     4
+
+// Parameters for RGB10MAX
+#elif defined(DEVICE_RGB10MAX)
+   #define SCREEN_WIDTH             854
+   #define SCREEN_HEIGHT            480
+   #define HARDWARE_ACCELERATION    0
+   #define FULLSCREEN               1
+   #define FONT_NAME                "NotoSans-Regular.ttf"
+   #define FONT_NAME_MONO           "NotoSansMono-Regular.ttf"
+   #define FONT_SIZE                20
+   #define LINE_HEIGHT              32
+   #define ICON_SIZE                24
+   #define MARGIN_X                 20
+   #define KEYBOARD_MARGIN          8
+   #define KEYBOARD_KEY_SPACING     4
+
 // Paramaters for desktop PC
 #else
-   #define SCREEN_WIDTH             640
+   #define SCREEN_WIDTH             854
    #define SCREEN_HEIGHT            480
    #define HARDWARE_ACCELERATION    1
    #define FULLSCREEN               0
@@ -100,6 +145,7 @@
    #define KEYBOARD_MARGIN          8
    #define KEYBOARD_KEY_SPACING     4
 #endif
+
 
 // Colors
 #define COLOR_TITLE_BG           68,  68,  68
@@ -213,6 +259,60 @@
    #define BUTTON_HELD_RIGHT              SDL_JoystickGetButton(g_joystick, 13)
    #define BUTTON_HELD_PAGEUP             SDL_JoystickGetButton(g_joystick, 4) || SDL_JoystickGetButton(g_joystick, 6)
    #define BUTTON_HELD_PAGEDOWN           SDL_JoystickGetButton(g_joystick, 5) || SDL_JoystickGetButton(g_joystick, 7)
+   #define BUTTON_HELD_SELECT             SDL_JoystickGetButton(g_joystick, 2)
+#elif defined(DEVICE_OGA1)
+   #define BUTTON_PRESSED_UP              event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 8
+   #define BUTTON_PRESSED_DOWN            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 9
+   #define BUTTON_PRESSED_LEFT            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 10
+   #define BUTTON_PRESSED_RIGHT           event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 11
+   #define BUTTON_PRESSED_PAGEUP          event.type == SDL_JOYBUTTONDOWN && (event.jbutton.button == 4 || event.jbutton.button == 14)
+   #define BUTTON_PRESSED_PAGEDOWN        event.type == SDL_JOYBUTTONDOWN && (event.jbutton.button == 5 || event.jbutton.button == 15)
+   #define BUTTON_PRESSED_VALIDATE        event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 1
+   #define BUTTON_PRESSED_BACK            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 0
+   #define BUTTON_PRESSED_MENU_CONTEXT    event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 3
+   #define BUTTON_PRESSED_SELECT          event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 2
+   #define BUTTON_HELD_UP                 SDL_JoystickGetButton(g_joystick, 8)
+   #define BUTTON_HELD_DOWN               SDL_JoystickGetButton(g_joystick, 9)
+   #define BUTTON_HELD_LEFT               SDL_JoystickGetButton(g_joystick, 10)
+   #define BUTTON_HELD_RIGHT              SDL_JoystickGetButton(g_joystick, 11)
+   #define BUTTON_HELD_PAGEUP             SDL_JoystickGetButton(g_joystick, 4) || SDL_JoystickGetButton(g_joystick, 14)
+   #define BUTTON_HELD_PAGEDOWN           SDL_JoystickGetButton(g_joystick, 5) || SDL_JoystickGetButton(g_joystick, 15)
+   #define BUTTON_HELD_SELECT             SDL_JoystickGetButton(g_joystick, 2)
+#elif defined(DEVICE_OGS)
+   #define BUTTON_PRESSED_UP              event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 8
+   #define BUTTON_PRESSED_DOWN            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 9
+   #define BUTTON_PRESSED_LEFT            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 10
+   #define BUTTON_PRESSED_RIGHT           event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 11
+   #define BUTTON_PRESSED_PAGEUP          event.type == SDL_JOYBUTTONDOWN && (event.jbutton.button == 4 || event.jbutton.button == 14)
+   #define BUTTON_PRESSED_PAGEDOWN        event.type == SDL_JOYBUTTONDOWN && (event.jbutton.button == 5 || event.jbutton.button == 15)
+   #define BUTTON_PRESSED_VALIDATE        event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 1
+   #define BUTTON_PRESSED_BACK            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 0
+   #define BUTTON_PRESSED_MENU_CONTEXT    event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 3
+   #define BUTTON_PRESSED_SELECT          event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 2
+   #define BUTTON_HELD_UP                 SDL_JoystickGetButton(g_joystick, 8)
+   #define BUTTON_HELD_DOWN               SDL_JoystickGetButton(g_joystick, 9)
+   #define BUTTON_HELD_LEFT               SDL_JoystickGetButton(g_joystick, 10)
+   #define BUTTON_HELD_RIGHT              SDL_JoystickGetButton(g_joystick, 11)
+   #define BUTTON_HELD_PAGEUP             SDL_JoystickGetButton(g_joystick, 4) || SDL_JoystickGetButton(g_joystick, 14)
+   #define BUTTON_HELD_PAGEDOWN           SDL_JoystickGetButton(g_joystick, 5) || SDL_JoystickGetButton(g_joystick, 15)
+   #define BUTTON_HELD_SELECT             SDL_JoystickGetButton(g_joystick, 2)
+#elif defined(DEVICE_RGB10MAX)
+   #define BUTTON_PRESSED_UP              event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 8
+   #define BUTTON_PRESSED_DOWN            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 9
+   #define BUTTON_PRESSED_LEFT            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 10
+   #define BUTTON_PRESSED_RIGHT           event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 11
+   #define BUTTON_PRESSED_PAGEUP          event.type == SDL_JOYBUTTONDOWN && (event.jbutton.button == 4 || event.jbutton.button == 14)
+   #define BUTTON_PRESSED_PAGEDOWN        event.type == SDL_JOYBUTTONDOWN && (event.jbutton.button == 5 || event.jbutton.button == 15)
+   #define BUTTON_PRESSED_VALIDATE        event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 1
+   #define BUTTON_PRESSED_BACK            event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 0
+   #define BUTTON_PRESSED_MENU_CONTEXT    event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 3
+   #define BUTTON_PRESSED_SELECT          event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 2
+   #define BUTTON_HELD_UP                 SDL_JoystickGetButton(g_joystick, 8)
+   #define BUTTON_HELD_DOWN               SDL_JoystickGetButton(g_joystick, 9)
+   #define BUTTON_HELD_LEFT               SDL_JoystickGetButton(g_joystick, 10)
+   #define BUTTON_HELD_RIGHT              SDL_JoystickGetButton(g_joystick, 11)
+   #define BUTTON_HELD_PAGEUP             SDL_JoystickGetButton(g_joystick, 4) || SDL_JoystickGetButton(g_joystick, 14)
+   #define BUTTON_HELD_PAGEDOWN           SDL_JoystickGetButton(g_joystick, 5) || SDL_JoystickGetButton(g_joystick, 15)
    #define BUTTON_HELD_SELECT             SDL_JoystickGetButton(g_joystick, 2)
 #else
    #define BUTTON_PRESSED_UP              event.type == SDL_KEYDOWN && event.key.repeat == 0 && event.key.keysym.sym == SDLK_UP

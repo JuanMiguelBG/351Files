@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 
 #TOOLCHAIN_DIR="$HOME"/Dev/351ELEC/build.351ELEC-RG351V.aarch64/toolchain
 VERSION="1.0"
