@@ -119,24 +119,22 @@ std::string FileUtils::formatSize(const unsigned long long int &p_size)
 
 //------------------------------------------------------------------------------
 
-// To lower case
-static void AsciiToLower(std::string *s)
+// String to lower case
+void FileUtils::toLower(std::string &s)
 {
-   for (char &c : *s)
+   for (char &c : s)
       if (c >= 'A' && c <= 'Z')
          c -= ('Z' - 'z');
 }
 
 //------------------------------------------------------------------------------
 
-// Lower case file extension
-std::string FileUtils::getLowercaseFileExtension(const std::string &p_name) {
-   const auto dot_pos = p_name.rfind('.');
-   if (dot_pos == std::string::npos)
+// File extension
+std::string FileUtils::getFileExtension(const std::string &p_name) {
+   const auto l_pos = p_name.rfind('.');
+   if (l_pos == std::string::npos)
       return "";
-   std::string ext = p_name.substr(dot_pos + 1);
-   AsciiToLower(&ext);
-   return ext;
+   return p_name.substr(l_pos + 1);
 }
 
 //------------------------------------------------------------------------------
@@ -154,7 +152,41 @@ bool FileUtils::fileExists(const std::string &p_path)
 std::string FileUtils::getFileName(const std::string &p_path)
 {
    size_t l_pos = p_path.rfind('/');
+   if (l_pos == std::string::npos)
+      return p_path;
    return p_path.substr(l_pos + 1);
+}
+
+//------------------------------------------------------------------------------
+// Extract file name stem from a path
+std::string FileUtils::getStem(const std::string &p_path)
+{
+   std::string fileName = getFileName(p_path);
+   size_t      offset   = std::string::npos;
+
+   // empty fileName
+   if(fileName == ".")
+      return fileName;
+
+   // find last '.' and erase the extension
+   if((offset = fileName.find_last_of('.')) != std::string::npos)
+      return fileName.erase(offset);
+
+   // no '.' found, filename has no extension
+   return fileName;
+}
+
+//------------------------------------------------------------------------------
+// Extract file name extension from a path
+std::string FileUtils::getExtension(const std::string &p_path)
+{
+   const char *str = p_path.c_str();
+
+   const char *ext;
+   if (str && *str != '\0' && ((ext = strrchr(str, '.'))) && strpbrk(ext, "/\\") == nullptr)
+      return ext;
+
+   return std::string();
 }
 
 //------------------------------------------------------------------------------
@@ -163,17 +195,31 @@ std::string FileUtils::getFileName(const std::string &p_path)
 std::string FileUtils::getDirName(const std::string &p_path)
 {
    size_t l_pos = p_path.rfind('/');
+   if (l_pos == std::string::npos)
+      return p_path;
+   return p_path.substr(0, l_pos);
+}
+
+//------------------------------------------------------------------------------
+
+// Extract file name without extension
+std::string FileUtils::getRootName(const std::string &p_path)
+{
+   const auto l_pos = p_path.rfind('.');
+   if (l_pos == std::string::npos)
+      return p_path;
    return p_path.substr(0, l_pos);
 }
 
 //------------------------------------------------------------------------------
 
 // Copy files to dest dir
-void FileUtils::copyFiles(const std::vector<std::string> &p_src, const std::string &p_dest)
+void FileUtils::copyOrMoveFiles(const char p_action, const std::vector<std::string> &p_src, const std::string &p_dest)
 {
    std::string l_destFile;
    std::string l_fileName;
-   bool l_confirm(true);
+   bool l_yesToAll(false);
+   bool l_noToAll(false);
    bool l_execute(true);
    for (auto l_it = p_src.begin(); l_it != p_src.end(); ++l_it)
    {
@@ -181,81 +227,72 @@ void FileUtils::copyFiles(const std::vector<std::string> &p_src, const std::stri
       l_fileName = getFileName(*l_it);
       l_destFile = p_dest + (p_dest.at(p_dest.size() - 1) == '/' ? "" : "/") + l_fileName;
 
-      // Check if destination files already exists
-      if (l_confirm && fileExists(l_destFile))
+      // Case: source file and destination file are the same
+      if (*l_it == l_destFile)
       {
-         INHIBIT(std::cout << "File " << l_destFile << " already exists => ask for confirmation" << std::endl;)
-         Dialog l_dialog("Question:");
-         l_dialog.addLabel("Overwrite " + l_fileName + "?");
-         l_dialog.addOption("Yes", 0, g_iconSelect);
-         l_dialog.addOption("Yes to all", 1, g_iconSelect);
-         l_dialog.addOption("No", 2, g_iconNone);
-         l_dialog.addOption("Cancel", 3, g_iconCancel);
-         switch (l_dialog.execute())
+         // Copy => duplicate 'file.ext' as 'file_copy.ext'
+         if (p_action == 'c')
          {
-            // Yes
-            case 0: break;
-            // Yes to all
-            case 1: l_confirm = false; break;
-            // No
-            case 2: l_execute = false; break;
-            // Cancel
-            default: return;
+            std::string ext = getFileExtension(l_destFile);
+            l_destFile = getRootName(l_destFile) + "_copy" + (ext.empty() ? "" : ".")  + ext;
+         }
+         // Move => do nothing
+         else if (p_action == 'm')
+         {
+            continue;
          }
       }
-      if (l_execute)
-      {
-         INHIBIT(std::cout << "Copy " << *l_it << " to " << p_dest << "\n";)
-         Run("cp", "-r", *l_it, p_dest);
-         Run("sync", l_destFile);
-      }
-   }
-}
 
-//------------------------------------------------------------------------------
-
-// Move files to dest dir
-void FileUtils::moveFiles(const std::vector<std::string> &p_src, const std::string &p_dest)
-{
-   std::string l_destFile;
-   std::string l_fileName;
-   bool l_confirm(true);
-   bool l_execute(true);
-   for (auto l_it = p_src.begin(); l_it != p_src.end(); ++l_it)
-   {
-      l_execute = true;
-      // Check if destination files already exists
-      if (l_confirm)
+      // Check if destination file already exists
+      if (fileExists(l_destFile))
       {
-         l_fileName = getFileName(*l_it);
-         l_destFile = p_dest + (p_dest.at(p_dest.size() - 1) == '/' ? "" : "/") + l_fileName;
-         if (fileExists(l_destFile))
+         INHIBIT(std::cout << "File " << l_destFile << " already exists\n";)
+         // If 'no to all', go to next file
+         if (l_noToAll)
+            continue;
+         if (!l_yesToAll)
          {
-            INHIBIT(std::cout << "File " << l_destFile << " already exists => ask for confirmation" << std::endl;)
+            // Ask for confirmation
             Dialog l_dialog("Question:");
-            l_dialog.addLabel("Overwrite " + l_fileName + "?");
+            l_dialog.addLabel("Overwrite " + getFileName(l_destFile) + "?");
             l_dialog.addOption("Yes", 0, g_iconSelect);
             l_dialog.addOption("Yes to all", 1, g_iconSelect);
             l_dialog.addOption("No", 2, g_iconNone);
-            l_dialog.addOption("Cancel", 3, g_iconCancel);
+            l_dialog.addOption("No to all", 3, g_iconNone);
+            l_dialog.addOption("Cancel", 4, g_iconCancel);
             switch (l_dialog.execute())
             {
                // Yes
                case 0: break;
                // Yes to all
-               case 1: l_confirm = false; break;
+               case 1: l_yesToAll = true; break;
                // No
                case 2: l_execute = false; break;
+               // No to all
+               case 3: l_execute = false; l_noToAll = true; break;
                // Cancel
                default: return;
             }
          }
       }
+
+      // Execute command
       if (l_execute)
       {
-         INHIBIT(std::cout << "Move " << *l_it << " to " << p_dest << "\n";)
-         Run("mv", *l_it, p_dest);
-         Run("sync", p_dest);
+         switch(p_action)
+         {
+            case 'c':
+               INHIBIT(std::cout << "Copy " << *l_it << " to " << l_destFile << "\n";)
+               Run("cp", "-r", *l_it, l_destFile);
+               break;
+            case 'm':
+               INHIBIT(std::cout << "Move " << *l_it << " to " << l_destFile << "\n";)
+               Run("mv", *l_it, l_destFile);
+               break;
+            default:
+               return;
+         }
+         Run("sync", l_destFile);
       }
    }
 }
@@ -372,8 +409,14 @@ bool FileUtils::fileIsText(const std::string &p_path)
       std::cerr << "getDirSize: Error popen\n";
       return 0;
    }
+
    while (fgets(buffer, sizeof(buffer), pipe) != NULL);
    pclose(pipe);
    line = buffer;
-   return (line.substr(0, 4) == "text" && line.find("charset=us-ascii") != std::string::npos);
+   if (line.substr(0, 4) == "text" && line.find("charset=us-ascii") != std::string::npos)
+      return true;
+
+   std::string extension = getExtension(p_path);
+   return ((extension == ".xml") || (extension == ".txt") || (extension == ".log") || (extension == ".sh") || (extension == ".csv") || (extension == ".prop") || (extension == ".properties")
+      || (extension == ".ini") || (extension == ".cfg") || (extension == ".config") || (extension == ".conf") || (extension == ".json"));
 }

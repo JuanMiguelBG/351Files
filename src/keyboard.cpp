@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "keyboard.h"
 #include "def.h"
 #include "sdlutils.h"
@@ -21,11 +22,13 @@ Keyboard::Keyboard(IWindow *p_parent, const bool p_quitOnEnter):
    m_keyLabel[1] = "QWERTYUIOP ASDFGHJKL  ZXCVBNM-,";
    m_keyLabel[2] = "1234567890 .,:!?/\\\"'  ()[]<>_;$";
    m_keyLabel[3] = "1234567890 ()[]{}~|^  @#%&*-+=`";
-   m_texShiftEmpty = SDLUtils::loadTexture(std::string(RES_PATH) + "/keyboard_shift_empty.png");
-   m_texShiftFull = SDLUtils::loadTexture(std::string(RES_PATH) + "/keyboard_shift_full.png");
-   m_texEnter = SDLUtils::loadTexture(std::string(RES_PATH) + "/keyboard_enter.png");
-   m_texArrow = SDLUtils::loadTexture(std::string(RES_PATH) + "/keyboard_arrow.png");
-   m_texBackspace = SDLUtils::loadTexture(std::string(RES_PATH) + "/keyboard_backspace.png");
+   std::ostringstream oss;
+   oss << '/' << KEYBOARD_SYMBOL_SIZE;
+   m_texShiftEmpty =    SDLUtils::loadTexture(std::string(RES_PATH) + oss.str() + "/keyboard_shift_empty.png");
+   m_texShiftFull =     SDLUtils::loadTexture(std::string(RES_PATH) + oss.str() + "/keyboard_shift_full.png");
+   m_texEnter =         SDLUtils::loadTexture(std::string(RES_PATH) + oss.str() + "/keyboard_enter.png");
+   m_texArrow =         SDLUtils::loadTexture(std::string(RES_PATH) + oss.str() + "/keyboard_arrow.png");
+   m_texBackspace =     SDLUtils::loadTexture(std::string(RES_PATH) + oss.str() + "/keyboard_backspace.png");
    init();
 }
 
@@ -86,57 +89,10 @@ void Keyboard::keyPressed(const SDL_Event &event)
    // Button Validate
    if (BUTTON_PRESSED_VALIDATE)
    {
-      // Reset timer
-      resetTimer();
-      // Character key
-      if ((m_cursor >= 0 && m_cursor <= 9) || (m_cursor >= 11 && m_cursor <= 19) || (m_cursor >= 22 && m_cursor <= 30))
-      {
-         // Call parent callback
-         m_parent->keyboardInputChar(m_keyLabel[m_keyLabelCurrent].substr(m_cursor, 1));
-      }
-      // Backspace
-      else if (m_cursor == 10)
-      {
-         // Call parent callback
-         m_parent->keyboardBackspace();
-      }
-      // Enter
-      else if (m_cursor == 20)
-      {
-         if (m_quitOnEnter)
-            m_retVal = 0;
-         else
-            // Call parent callback
-            m_parent->keyboardInputEnter();
-      }
-      // Space
-      else if (m_cursor == 33)
-      {
-         // Call parent callback
-         m_parent->keyboardInputChar(" ");
-      }
-      // Shift
-      else if (m_cursor == 21 || m_cursor == 31)
-      {
-         keyPressedShift();
-      }
-      // Symbol
-      else if (m_cursor == 32)
-      {
-         keyPressedSymbol();
-      }
-      // Left arrow
-      else if (m_cursor == 34)
-      {
-         // Call parent callback
-         m_parent->keyboardMoveLeft();
-      }
-      // Right arrow
-      else if (m_cursor == 35)
-      {
-         // Call parent callback
-         m_parent->keyboardMoveRight();
-      }
+      // Input key
+      input();
+      m_lastPressed = BUTTON_VALIDATE;
+      m_timer = KEYHOLD_TIMER_FIRST;
       return;
    }
    // Button Back
@@ -147,6 +103,79 @@ void Keyboard::keyPressed(const SDL_Event &event)
       // Close window with no return value
       m_retVal = -2;
       return;
+   }
+}
+
+//------------------------------------------------------------------------------
+
+// Specific key held
+bool Keyboard::keyHeld(void)
+{
+   if (BUTTON_HELD_VALIDATE)
+   {
+      if (m_lastPressed == BUTTON_VALIDATE && m_timer > 0 && --m_timer == 0)
+      {
+         input();
+         m_timer = KEYHOLD_TIMER;
+      }
+      return true;
+   }
+   return false;
+}
+
+//------------------------------------------------------------------------------
+
+// Input key
+void Keyboard::input(void)
+{
+   // Character key
+   if ((m_cursor >= 0 && m_cursor <= 9) || (m_cursor >= 11 && m_cursor <= 19) || (m_cursor >= 22 && m_cursor <= 30))
+   {
+      // Call parent callback
+      m_parent->keyboardInputChar(m_keyLabel[m_keyLabelCurrent].substr(m_cursor, 1));
+   }
+   // Backspace
+   else if (m_cursor == 10)
+   {
+      // Call parent callback
+      m_parent->keyboardBackspace();
+   }
+   // Enter
+   else if (m_cursor == 20)
+   {
+      if (m_quitOnEnter)
+         m_retVal = 0;
+      else
+         // Call parent callback
+         m_parent->keyboardInputEnter();
+   }
+   // Space
+   else if (m_cursor == 33)
+   {
+      // Call parent callback
+      m_parent->keyboardInputChar(" ");
+   }
+   // Shift
+   else if (m_cursor == 21 || m_cursor == 31)
+   {
+      keyPressedShift();
+   }
+   // Symbol
+   else if (m_cursor == 32)
+   {
+      keyPressedSymbol();
+   }
+   // Left arrow
+   else if (m_cursor == 34)
+   {
+      // Call parent callback
+      m_parent->keyboardMoveLeft();
+   }
+   // Right arrow
+   else if (m_cursor == 35)
+   {
+      // Call parent callback
+      m_parent->keyboardMoveRight();
    }
 }
 

@@ -3,18 +3,6 @@
 #include "sdlutils.h"
 #include <iostream>
 
-// Buttons with timer
-enum {
-   BUTTON_UP = 0,
-   BUTTON_PAGEUP,
-   BUTTON_DOWN,
-   BUTTON_PAGEDOWN,
-   BUTTON_LEFT,
-   BUTTON_RIGHT
-};
-
-//------------------------------------------------------------------------------
-
 // Destructor
 IWindow::~IWindow(void)
 {
@@ -175,6 +163,10 @@ int IWindow::execute(void)
             m_timer = KEYHOLD_TIMER;
          }
       }
+      else if (keyHeld())
+      {
+         // Action is done in specific class
+      }
       else
       {
          resetTimer();
@@ -187,15 +179,15 @@ int IWindow::execute(void)
       // Render windows if necessary
       if (g_hasChanged)
       {
+         g_hasChanged = false;
          renderAll();
          renderPresent();
-         g_hasChanged = false;
       }
 
       // Cap the framerate
-      l_time = MS_PER_FRAME - (SDL_GetTicks() - l_time);
-      if (l_time <= MS_PER_FRAME)
-         SDL_Delay(l_time);
+      l_time = SDL_GetTicks() - l_time;
+      if (l_time < MS_PER_FRAME)
+         SDL_Delay(MS_PER_FRAME - l_time);
    }
    return m_retVal;
 }

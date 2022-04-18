@@ -1,1 +1,5 @@
 351Files.geany
+351Files
+351Files-no_strip
+/src/*.o
+/build
