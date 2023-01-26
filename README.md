@@ -65,6 +65,9 @@ cd 351Files
 ## For 351P and ArkOS
 ./build_RG351.sh RG351P ArkOS /roms ./res
 
+## For 351MP and ArkOS
+./build_RG351.sh RG351MP ArkOS /roms ./res
+
 ## For RGB10/OGA 1.1 (BE) and ArkOS
 ./build_RG351.sh RGB10 ArkOS /roms ./res
 
@@ -83,6 +86,12 @@ cd 351Files
 ## For RGB10MAX and RetroOZ
 ./build_RG351.sh RGB10MAX RetroOZ /roms ./res
 
+## For RG503 and ArkOS
+./build_RG351.sh RG503 ArkOS /roms ./res
+
+## For RG353V/VS/M/P and ArkOS
+./build_RG351.sh RG353 ArkOS /roms ./res
+
 Copy the res folder to your preferred folder location along with the 351Files executable. \
 You can also just grab the generated .tgz file and do as instructed in the installation section above in this readme.
 
@@ -90,6 +99,6 @@ You can also just grab the generated .tgz file and do as instructed in the insta
 Define the following variables when executing 'make':
 * CC
 * SDL2_CONFIG
-* DEVICE: CHI / RG351P / RG351V / RGB10 / RK2020 / OGA / OGA1 / OGS / RGB10MAX / PC
+* DEVICE: CHI / RG351 Family / RGB10 / RK2020 / OGA Family / OGS / RGB10MAX / RG503 / RG353 Family / PC
 * START_PATH
 * RES_PATH

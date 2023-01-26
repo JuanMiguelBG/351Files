@@ -41,6 +41,9 @@ rm -rf build
 # Build for 351P, ArkOS
 #build351Files RG351P ArkOS /roms ./res
 
+# Build for 351MP, ArkOS
+#build351Files RG351MP ArkOS /roms ./res
+
 # Build for RGB10, ArkOS
 #build351Files RGB10 ArkOS /roms ./res
 
@@ -49,5 +52,20 @@ rm -rf build
 
 # Build for CHI, ArkOS
 #build351Files CHI ArkOS /roms ./res
+
+# Build for OGA 1.1 and RetroOZ
+#build351Files OGA1 RetroOZ /roms ./res
+
+# Build for OGS and RetroOZ
+#build351FilesOGS RetroOZ /roms ./res
+
+# Build for RGB10MAX and RetroOZ
+#build351Files RGB10MAX RetroOZ /roms ./res
+
+# Build for RG503 and ArkOS
+#build351Files RG503 ArkOS /roms ./res
+
+# Build for RG353V/VS/M/P and ArkOS
+#build351Files RG353 ArkOS /roms ./res
 
 build351Files "$1" "$2" "$3" "$4"
